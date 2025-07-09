@@ -1,0 +1,11 @@
+{
+    "folder-color.pathColors": [
+        {
+            "folderPath": "Backend_PH_Tour_Management_System\\src\\app\\modules\\user\\",
+            "color": "foldercolorizer.color_99cc33"
+        },
+        {
+            "folderPath": "Backend_PH_Tour_Management_System\\src\\app\\modules\\user\\user.controller.ts\\"
+        }
+    ]
+}
