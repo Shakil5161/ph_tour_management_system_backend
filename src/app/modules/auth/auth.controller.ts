@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import httpStatus from "http-status-codes"
 import { JwtPayload } from "jsonwebtoken"
+import passport from "passport"
 import { envVars } from "../../config/env"
 import AppError from "../../errorHelpers/AppError"
 import { catchAsync } from "../../utils/catchAsync"
@@ -9,21 +10,68 @@ import { setAuthCookie } from "../../utils/setCookie"
 import { createUserTokens } from "../../utils/userTokens"
 import { AuthServices } from "./auth.service"
 
-const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const CredentialsLogin = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-        const loginInfo = await AuthServices.loginUser(req.body)
+        // const loginInfo = await AuthServices.loginUser(req.body)
+console.log("CredentialsLogin")
+        passport.authenticate("local", async (err: any, user: any, info: any) => {
+            console.log("CredentialsLogin inside passport")
+            if(err){
+                // return next(err)
+                return next(new AppError(401, err))
+            }
 
-        setAuthCookie(res, loginInfo);
+            if(!user){
+                // return new AppError(401, info.message)
+                return next(new AppError(401, info.message))
+            }
 
-        sendResponse(res, {
-            success: true,
-            statusCode: httpStatus.OK,
-            message: "User Login Successfully",
-            data: loginInfo
-        })
+            const userTokens = await createUserTokens(user)
+
+            const { password: pass, ...rest} = user.toObject()
+
+            setAuthCookie(res, userTokens)
+
+            sendResponse(res, {
+                success: true,
+                statusCode: httpStatus.OK,
+                message: "User Logged In Successfully",
+                data: {
+                    accessToken: userTokens.accessToken,
+                    refreshToken: userTokens.refreshToken,
+                    user: rest
+                }
+            })
+        })(req, res, next)
+
+        // setAuthCookie(res, loginInfo);
+
+        // sendResponse(res, {
+        //     success: true,
+        //     statusCode: httpStatus.OK,
+        //     message: "User Login Successfully",
+        //     data: loginInfo
+        // })
         
 
 })
+
+
+// const loginUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+//         const loginInfo = await AuthServices.loginUser(req.body)
+
+//         setAuthCookie(res, loginInfo);
+
+//         sendResponse(res, {
+//             success: true,
+//             statusCode: httpStatus.OK,
+//             message: "User Login Successfully",
+//             data: loginInfo
+//         })
+        
+
+// })
 
 const getNewAccessToken = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies.refreshToken;
@@ -120,4 +168,4 @@ const googleCallbackController = catchAsync(async (req: Request, res: Response, 
     res.redirect(`${envVars.FRONTEND_URL}/${redirectTo}`)
 })
 
-export const AuthControllers = { loginUser, getNewAccessToken, logout, resetPassword, googleCallbackController }
+export const AuthControllers = { CredentialsLogin, getNewAccessToken, logout, resetPassword, googleCallbackController }

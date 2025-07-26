@@ -13,6 +13,9 @@ export const checkAuth = (...authRoles: string[]) => async (req: Request, res: R
         const accessToken = req.headers.authorization;
 
         if( !accessToken ) {
+
+
+            
             throw new AppError(403, "No Token Received")
         }
 

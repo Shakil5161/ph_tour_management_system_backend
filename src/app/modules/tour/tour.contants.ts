@@ -1,0 +1,1 @@
+export const tourSearchAbleField = ['title', 'description', 'location']

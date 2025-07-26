@@ -3,38 +3,37 @@ import httpStatus from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 import AppError from "../../errorHelpers/AppError";
-import { createNewAccessTokenWithRefreshToken, createUserTokens } from "../../utils/userTokens";
-import { IUser } from "../user/user.interface";
+import { createNewAccessTokenWithRefreshToken } from "../../utils/userTokens";
 import { User } from "../user/user.model";
 
-const loginUser = async (payload: Partial<IUser>) => {
-    const { email, password } = payload;
+// const loginUser = async (payload: Partial<IUser>) => {
+//     const { email, password } = payload;
 
-    const isUserExist = await User.findOne({ email })
+//     const isUserExist = await User.findOne({ email })
 
     
-    if(!isUserExist){
-        throw new AppError(httpStatus.BAD_GATEWAY, "Email does not exist")
-    }
+//     if(!isUserExist){
+//         throw new AppError(httpStatus.BAD_GATEWAY, "Email does not exist")
+//     }
     
-    const hashedPassword = await bcrypt.compare(password as string, isUserExist.password as string )
+//     const hashedPassword = await bcrypt.compare(password as string, isUserExist.password as string )
     
-    if(!hashedPassword){
-        throw new AppError(httpStatus.BAD_GATEWAY, "Incorrect password")
-    }
+//     if(!hashedPassword){
+//         throw new AppError(httpStatus.BAD_GATEWAY, "Incorrect password")
+//     }
     
-    const userTokens = createUserTokens(isUserExist);
+//     const userTokens = createUserTokens(isUserExist);
 
 
-    const {password: pass, ...rest} = isUserExist.toObject() 
+//     const {password: pass, ...rest} = isUserExist.toObject() 
 
-    return {
-        accessToken: userTokens.accessToken,
-        refreshToken: userTokens.refreshToken,
-        user: rest
+//     return {
+//         accessToken: userTokens.accessToken,
+//         refreshToken: userTokens.refreshToken,
+//         user: rest
         
-    } 
-}
+//     } 
+// }
 
 
 const getNewAccessToken = async (refreshToken: string) => {
@@ -60,7 +59,7 @@ const resetPassword = async ( oldPassword: string, newPassword: string, decodedT
 }
 
 export const AuthServices = {
-    loginUser,
+    // loginUser,
     getNewAccessToken,
     resetPassword
 }
